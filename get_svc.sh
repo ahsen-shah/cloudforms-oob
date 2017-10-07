@@ -48,10 +48,11 @@ fi
 
 get_token
 
+my_id=$(get_my_user_id)
+
 curl -s \
      -H "X-Auth-Token: ${tok}" \
      -H "Content-Type: application/json" \
      -X GET \
-     $uri/api/services?attributes=name\&expand=resources\
-    | jq -r '.resources[]|(.id|tostring) + " " + .name' \
-    | grep -i "${username}"
+     "${uri}/api/services?attributes=name\&filter\[\]=evm_owner_id=${my_id}\&expand=resources" \
+    | jq -r '.resources[]|(.id|tostring) + " " + .name'

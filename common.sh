@@ -29,6 +29,17 @@ get_token() {
     export tok_expire_on=$(date --date="now + ${tok_ttl} seconds" +%s)
 }
 
+get_my_user_id() {
+    get_token
+
+    curl -s \
+         -H "X-Auth-Token: ${tok}" \
+         -H "Content-Type: application/json" \
+         -X GET \
+         "$uri/api/users?attributes=id,userid,name\&filter\[\]=userid='${username}'&expand=resources" \
+         | jq -r ".resources[] | select(.userid == \"${username}\") | .id"
+}
+
 json_escape () {
     printf '%s' "$1" | python -c 'import json,sys; print(json.dumps(sys.stdin.read()))'
 }
