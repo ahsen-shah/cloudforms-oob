@@ -1,53 +1,109 @@
+= CloudForms Out of Browser
+
 == ORDER_SVC
 
 === Purpose
 
 Order Red Hat CloudForms (or ManageIQ) services in bulk via the API.  You must provide a catalog name and catalog item (in text format).
 
-=== Username
+[options="header",cols=",a"]
+|==========================
+| Argument | Comment
+| Username
+| If you do not provide a user name, you will be prompted for one.  
 
-If you do not provide a user name, you will be prompted for one.  
+| Total Requests
+| `-t <n>` - Total requests specifies the amount of services you wish to order in total.
 
-=== Total Requests
+| Group Count and Wait 
+| `-g <n>` - Group count allows you to break up the orders into groups equaling the number of services specified.
 
--t <n> - Total requests specifies the amount of services you wish to order in total.
+`-p <n>` - Group wait will pause ordering between groups.
 
-=== Group Count and Wait 
+| API Wait
+| `-a <n>` - Api wait specifies a quick pause between API calls in the same group.
 
--g <n> - Group count allows you to break up the orders into groups equaling the number of services specified.
+| URI
+| `-w <n>` - Uri is the URI of your CloudForms/ManageIQ appliance.
 
--p <n> - Group wait will pause ordering between groups.
+| Keypairs
+| `-d <key1=value1;key2=value2...>` - Using the this flag you can specify keypairs to fill out the dialog (if any) in the order form.  They are semicolon delimited key value pairs and the key must equal the "Name" value in the service dialog.
 
-=== API Wait
+| Non-Interactive
+| Use `-y` if you don't want to be prompted if you are sure you wish to continue.  *Use at your own risk!*
+|==========================
 
--a <n> - Api wait specifies a quick pause between API calls in the same group.
-
-=== URI
-
--w <n> - Uri is the URI of your CloudForms/ManageIQ appliance.
-
-=== Keypairs
-
--d <key1=value1;key2=value2...> - Using the this flag you can specify keypairs to fill out the dialog (if any) in the order form.  They are semicolon delimited key value pairs and the key must equal the "Name" value in the service dialog.
-
-
-=== Non-Interactive
-
-Use -n if you don't want to be prompted if you are sure you wish to continue.  *Use at your own risk!*
 
 === Usage
 
 ----
-# order_svc.sh -c <catalog name> -i <item name> [ -u <username> -t <totalRequests> -g <groupCount> -p <groupWait> -a <apiWait> -w <uri> -d <key1=value1;key2=value2...> -n ]
+# order_svc.sh -c <catalog name> -i <item name> [ -u <username> -t <totalRequests> -g <groupCount> -p <groupWait> -a <apiWait> -w <uri> -d <key1=value1;key2=value2...> -y ]
 ----
 
 
-== get_svcs.sh
+== get_svc.sh
 
 Get a list of your ordered services (to get GUIDs)
 
+The script outputs one service per line in the format  `ID NAME`.
+
+The output of this script can be grep-ed and passed to delete_svc.sh.
+
 === Usage
 
 ----
-# get_svcs.sh -i <item name> -u <username> [ -w <uri> ]
+# get_svc.sh [-u <username>] [ -w <uri> ]
+----
+
+
+== delete_svc.sh
+
+Use this script with caution!
+
+INPUT: each line is a service to delete. Each line must be of the form:
+
+----
+ID  NAME
+----
+
+for example:
+
+----
+20000000056794 OTLC-ADM-gucore-redhat.com-DEV_THREE_TIER_APP-a63d
+----
+
+You can pipe the output of `get_svc.sh` to `delete_svc.sh`:
+
+----
+./get_svc.sh | grep OCP | ./delete_svc.sh
+----
+
+=== Usage
+----
+Error: Usage $0 [-u <username>] [ -w <uri> ]
+
+This script reads the input from STDIN. Each line should be ID NAME of service to retire.
+ex:   . credentials.rc; ./get_svc.sh | grep 'OCP'| ./delete_svc.sh
+----
+
+Password cannot be prompted because the script already reads from STDIN. It has to be set as an env variable.
+
+== Automation with env variables
+
+The mandatory variables are:
+
+. username
+. password
+. uri
+
+You can set the mandatory variables as environment variables, with `export password=...` for password, username and uri or source it from a file. Then the script can be run without interaction.
+
+Example:
+
+----
+. credentials.rc ;  ./order_svc.sh -t 20 -g 5 -c 'OPENTLC Cloud Infrastructure Labs' -i 'DEV 3 Tier App' -y
+. credentials.rc ; ./get_svc.sh
+# check output before deleting!
+# delete all your services:
+. credentials.rc ; ./get_svc.sh | ./delete_svc.sh
 ----
