@@ -31,6 +31,8 @@ get_token() {
     export tok_expire_on
 }
 
+# curl shortcut to GET, you don't have to provide complete URI,
+# path is enough, for example: cfget /api/services
 cfget() {
     get_token
 
@@ -39,6 +41,18 @@ cfget() {
          -H "Content-Type: application/json" \
          -X GET \
          "${uri}/${1}"
+}
+
+
+# curl shortcut to POST, you have to provide complete URI
+cfpost() {
+    get_token
+
+    curl -s \
+         -H "X-Auth-Token: ${tok}" \
+         -H "Content-Type: application/json" \
+         -X POST \
+         "$@"
 }
 
 get_my_user_id() {

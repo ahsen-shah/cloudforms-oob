@@ -109,14 +109,11 @@ g=1
 while [ $t -le "$totalRequests" ]; do
     c=1
 
-    get_token
 
     while [ $c -le "$groupCount" ] && [ $t -le "$totalRequests" ]; do
-        curl -s -H "X-Auth-Token: $tok" \
-             -H "Content-Type: application/json" \
-             -X POST \
-             "${uri}/api/service_catalogs/${catalogID}/service_templates" \
-             -d "$PAYLOAD" \
+        cfpost \
+            "${uri}/api/service_catalogs/${catalogID}/service_templates" \
+            -d "$PAYLOAD" \
             | python -m json.tool
         (( c = c + 1 ))
         (( t = t + 1 ))

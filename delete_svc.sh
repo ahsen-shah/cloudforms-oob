@@ -53,11 +53,8 @@ while read -r itemID name; do
 
     PAYLOAD="{ \"action\": \"retire\", \"resource\": { \"href\": \"${uri}/api/services/${itemID}\" } }"
 
-    curl -s \
-         -H "X-Auth-Token: $tok" \
-         -H "Content-Type: application/json" \
-         -X POST \
-         -d "${PAYLOAD}" \
-         "${uri}/api/services" \
+    cfpost \
+        -d "${PAYLOAD}" \
+        "${uri}/api/services" \
         | jq -r '.results[]| (.id|tostring) + " " + .name'
 done
