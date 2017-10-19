@@ -1,5 +1,55 @@
 = CloudForms Out of Browser
 
+This repository contains scripts to order/list/retire services from CloudForms using the CloudForms API.
+
+== Examples
+
+.order examples
+[source,sh]
+----
+# export credentials
+export username=username-domain.com
+export password=yourpassword
+export uri=https://labs.opentlc.com
+
+
+# order 5 service items 'OCP HA Lab - Testing' from catalog 'DevOps Deployment Testing' in North America
+./order_svc.sh -t 5 -y \
+                   -c 'DevOps Deployment Testing' \
+                   -d region=na \
+                   -i 'OCP HA Lab - Testing'
+
+# order 2 x OCP HA Lab (PROD) in APAC datacenter
+./order_svc.sh -t 2 -y \
+                   -d region=apac \
+                   -c 'OPENTLC OpenShift Labs' \
+                   -i 'OpenShift HA Lab'
+
+# order 45 x OCP HA Lab (PROD), wait 20 seconds between api calls, group by 5, pause 5 minutes between groups.
+./order_svc.sh -t 45 -a 20 -g 5 -p 5 -y \
+                   -d region=na \
+                   -c 'OPENTLC OpenShift Labs' \
+                   -i 'OpenShift HA Lab'
+----
+
+.Delete example from terminal
+----
+[user@work cloudforms-oob]$ ./get_svc.sh
+20000000059300 OTLC-ADM-gucore-redhat.com-DEV_THREE_TIER_APP-f3b8
+20000000059304 OTLC-ADM-gucore-redhat.com-DEV_OCP_WORKSHOP-c53b
+20000000059302 OTLC-ADM-gucore-redhat.com-DEV_OCP_DEMO_LAB-1909
+20000000059301 OTLC-ADM-gucore-redhat.com-DEV_ANS_TOWER_LAB-f377
+20000000059303 OTLC-ADM-gucore-redhat.com-DEV_OCP_HA_LAB-442f
+
+[user@work cloudforms-oob]$ ./get_svc.sh | ./delete_svc.sh
+20000000059300 OTLC-ADM-gucore-redhat.com-DEV_THREE_TIER_APP-f3b8
+20000000059304 OTLC-ADM-gucore-redhat.com-DEV_OCP_WORKSHOP-c53b
+20000000059302 OTLC-ADM-gucore-redhat.com-DEV_OCP_DEMO_LAB-1909
+20000000059301 OTLC-ADM-gucore-redhat.com-DEV_ANS_TOWER_LAB-f377
+20000000059303 OTLC-ADM-gucore-redhat.com-DEV_OCP_HA_LAB-442f
+----
+
+
 == ORDER_SVC
 
 === Purpose
@@ -10,12 +60,12 @@ Order Red Hat CloudForms (or ManageIQ) services in bulk via the API.  You must p
 |==========================
 | Argument | Comment
 | Username
-| If you do not provide a user name, you will be prompted for one.  
+| If you do not provide a user name, you will be prompted for one.
 
 | Total Requests
 | `-t <n>` - Total requests specifies the amount of services you wish to order in total.
 
-| Group Count and Wait 
+| Group Count and Wait
 | `-g <n>` - Group count allows you to break up the orders into groups equaling the number of services specified.
 
 `-p <n>` - Group wait will pause ordering between groups.
@@ -32,7 +82,6 @@ Order Red Hat CloudForms (or ManageIQ) services in bulk via the API.  You must p
 | Non-Interactive
 | Use `-y` if you don't want to be prompted if you are sure you wish to continue.  *Use at your own risk!*
 |==========================
-
 
 === Usage
 
