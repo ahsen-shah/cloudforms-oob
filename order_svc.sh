@@ -1,6 +1,7 @@
 #!/bin/bash
-ORIG=$(cd $(dirname $0); pwd)
+ORIG="$(cd "$(dirname "$0")" || exit; pwd)"
 
+# shellcheck source=common.sh
 . "${ORIG}/common.sh"
 
 IFS=";"
@@ -36,7 +37,7 @@ while getopts yu:c:i:t:g:p:a:w:d: FLAG; do
     esac
 done
 
-if [ -z "$catalogName" -o -z "$itemName" ]
+if [ -z "$catalogName" ] || [ -z "$itemName" ]
 then
     usage
     exit 1
@@ -45,28 +46,24 @@ fi
 if [ -z "$uri" ]
 then
     echo -n "Enter CF URI: "
-    read uri
+    read -r uri
 fi
 
 if [ -z "$username" ]
 then
     echo -n "Enter CF Username: "
-    read username
+    read -r username
 fi
 
 if [ -z "$password" ]; then
     echo -n "Enter CF Password: "
     stty -echo
-    read password
+    read -r password
     stty echo
     echo
 fi
 
-get_token
-
-catalogID=$(curl -s -H "X-Auth-Token: $tok" \
-                 -H "Content-Type: application/json" \
-                 -X GET "${uri}/api/service_catalogs?attributes=name,id&expand=resources"\
+catalogID=$(cfget "/api/service_catalogs?attributes=name,id&expand=resources"\
                 | jq -r ".resources[] | select(.name == \"${catalogName}\") | .id")
 
 if [ -z "${catalogID}" ]; then
@@ -74,10 +71,7 @@ if [ -z "${catalogID}" ]; then
     exit 2
 fi
 
-itemID=$(curl -s -H "X-Auth-Token: $tok" \
-              -H "Content-Type: application/json" \
-              -X GET \
-              "${uri}/api/service_templates?attributes=service_template_catalog_id,id,name&expand=resources" \
+itemID=$(cfget "/api/service_templates?attributes=service_template_catalog_id,id,name&expand=resources" \
              | jq -r ".resources[] | select(.name == \"${itemName}\") | .id")
 
 if [ -z "${itemID}" ]; then
@@ -87,7 +81,8 @@ fi
 
 if [ "$noni" != 1 ]
 then
-    echo -n "Are you sure you wish to deploy $totalRequests instances of this catalog item? (y/N): ";read yn
+    echo -n "Are you sure you wish to deploy $totalRequests instances of this catalog item? (y/N): "
+    read -r yn
     if [ "$yn" != "y" ]
     then
         echo "Exiting."
@@ -100,37 +95,37 @@ if [ -n "$keypairs" ]
 then
     for kp in $keypairs
     do
-        k=`echo $kp|cut -f1 -d=`
-        v=`echo $kp|cut -f2 -d=`
+        k=$(echo "$kp"|cut -f1 -d=)
+        v=$(echo "$kp"|cut -f2 -d=)
         KPS="${KPS}, \"${k}\" : \"${v}\""
     done
 fi
 
 PAYLOAD="{ \"action\": \"order\", \"resource\": { \"href\": \"${uri}/api/service_templates/${itemID}\"${KPS} } }"
 
-((slp=$groupWait * 60))
+((slp=groupWait * 60))
 t=1
 g=1
-while [ $t -le $totalRequests ]; do
+while [ $t -le "$totalRequests" ]; do
     c=1
 
     get_token
 
-    while [ $c -le $groupCount -a $t -le $totalRequests ]; do
-        echo "Deploying request $t in group $g"
+    while [ $c -le "$groupCount" ] && [ $t -le "$totalRequests" ]; do
         curl -s -H "X-Auth-Token: $tok" \
              -H "Content-Type: application/json" \
              -X POST \
-             $uri/api/service_catalogs/$catalogID/service_templates -d "$PAYLOAD" \
+             "${uri}/api/service_catalogs/${catalogID}/service_templates" \
+             -d "$PAYLOAD" \
             | python -m json.tool
-        (( c = $c + 1 ))
-        (( t = $t + 1 ))
-        sleep $apiWait
+        (( c = c + 1 ))
+        (( t = t + 1 ))
+        sleep "$apiWait"
     done
 
-    if [ $t -le $totalRequests ]; then
+    if [ $t -le "$totalRequests" ]; then
         echo "Sleeping $slp seconds..."
-        (( g = $g + 1 ))
+        (( g = g + 1 ))
         sleep $slp
     fi
 done

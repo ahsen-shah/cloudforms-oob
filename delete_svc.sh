@@ -9,7 +9,9 @@
 # safety options
 set -e -o pipefail
 
-ORIG=$(cd $(dirname $0); pwd)
+ORIG="$(cd "$(dirname "$0")" || exit; pwd)"
+
+# shellcheck source=common.sh
 . "${ORIG}/common.sh"
 
 
@@ -22,8 +24,12 @@ usage() {
 
 while getopts hu: FLAG; do
     case $FLAG in
-        u) username="$OPTARG";;
-        w) uri="$OPTARG";;
+        u) username="$OPTARG"
+           export username
+           ;;
+        w) uri="$OPTARG"
+           export uri
+           ;;
         h) usage;exit;;
         *) usage;exit;;
     esac
@@ -35,15 +41,9 @@ if ! which jq > /dev/null; then
 fi
 
 
-get_token
-
-while read itemID name; do
+while read -r itemID name; do
     # ensure (itemID name) couple makes sense
-    remoteName=$(curl -s \
-                      -H "X-Auth-Token: $tok" \
-                      -H "Content-Type: application/json" \
-                      -X GET \
-                      $uri/api/services/${itemID}?attributes=name\&expand=resources \
+    remoteName=$(cfget "/api/services/${itemID}?attributes=name\&expand=resources" \
                      | jq -r '.name')
 
     if [ "${name}" != "${remoteName}" ]; then
@@ -58,6 +58,6 @@ while read itemID name; do
          -H "Content-Type: application/json" \
          -X POST \
          -d "${PAYLOAD}" \
-         $uri/api/services \
+         "${uri}/api/services" \
         | jq -r '.results[]| (.id|tostring) + " " + .name'
 done

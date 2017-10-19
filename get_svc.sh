@@ -5,20 +5,22 @@ set -e -o pipefail
 # CloudForms Get Services - Patrick Rutledge <prutledg@redhat.com>
 # CloudForms Out of the Browser - Guillaume Coré <gucore@redhat.com>
 
-ORIG=$(cd $(dirname $0); pwd)
+ORIG="$(cd "$(dirname "$0")" || exit; pwd)"
+
+# shellcheck source=common.sh
 . "${ORIG}/common.sh"
 
 # Dont touch from here on
 
 usage() {
-    echo "Error: Usage $0 [-u <username>] [ -w <uri> ]"
+    echo "Error: Usage $0 [-u <username>] [ -w <uri> ] [ -i <id> ]"
 }
 
-while getopts nu:w: FLAG; do
+while getopts nu:w:i: FLAG; do
     case $FLAG in
-        n) noni=1;;
         u) username="$OPTARG";;
         w) uri="$OPTARG";;
+        i) id="$OPTARG";;
         *) usage;exit;;
     esac
 done
@@ -30,29 +32,30 @@ fi
 
 if [ -z "$uri" ]; then
     echo >&2 -n "Enter CF URI: "
-    read uri
+    read -r uri
 fi
 
 if [ -z "$username" ]; then
     echo >&2 -n "Enter CF Username: "
-    read username
+    read -r username
 fi
 
 if [ -z "$password" ]; then
     echo >&2 -n "Enter CF Password: "
     stty -echo
-    read password
+    read -r password
     stty echo
     echo
 fi
 
-get_token
-
 my_id=$(get_my_user_id)
 
-curl -s \
-     -H "X-Auth-Token: ${tok}" \
-     -H "Content-Type: application/json" \
-     -X GET \
-     "${uri}/api/services?attributes=name\&filter\[\]=evm_owner_id=${my_id}\&expand=resources" \
-    | jq -r '.resources[]|(.id|tostring) + " " + .name'
+if [ -n "$id" ]; then
+    cfget \
+        "/api/services/${id}?attributes=all\&filter\[\]=evm_owner_id=${my_id}\&expand=resources" \
+        | jq .
+else
+    cfget \
+        "/api/services?attributes=name\&filter\[\]=evm_owner_id=${my_id}\&expand=resources" \
+        | jq -r '.resources[]|(.id|tostring) + " " + .name'
+fi
