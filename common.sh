@@ -1,6 +1,10 @@
 #!/bin/bash
 # get a token from CloudForms, keep the current if it's still valid.
 get_token() {
+    # init variables to support '-u' mode
+    tok=${tok:-''}
+    tok_expire_on=${tok_expire_on:-0}
+
     if [ -n "$tok" ]; then
         # verify it's still valid
 
