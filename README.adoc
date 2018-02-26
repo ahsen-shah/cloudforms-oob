@@ -77,7 +77,7 @@ Order Red Hat CloudForms (or ManageIQ) services in bulk via the API.  You must p
 | `-w <n>` - Uri is the URI of your CloudForms/ManageIQ appliance.
 
 | Keypairs
-| `-d <key1=value1;key2=value2...>` - Using the this flag you can specify keypairs to fill out the dialog (if any) in the order form.  They are semicolon delimited key value pairs and the key must equal the "Name" value in the service dialog.
+| `-d <key1=value1,key2=value2...>` - Using the this flag you can specify keypairs to fill out the dialog (if any) in the order form.  They are comma delimited key value pairs and the key must equal the "Name" value in the service dialog.
 
 | Non-Interactive
 | Use `-y` if you don't want to be prompted if you are sure you wish to continue.  *Use at your own risk!*
@@ -86,7 +86,7 @@ Order Red Hat CloudForms (or ManageIQ) services in bulk via the API.  You must p
 === Usage
 
 ----
-# order_svc.sh -c <catalog name> -i <item name> [ -u <username> -t <totalRequests> -g <groupCount> -p <groupWait> -a <apiWait> -w <uri> -d <key1=value1;key2=value2...> -y ]
+# order_svc.sh -c <catalog name> -i <item name> [ -u <username> -t <totalRequests> -g <groupCount> -p <groupWait> -a <apiWait> -w <uri> -d <key1=value1,key2=value2...> -y ]
 ----
 
 

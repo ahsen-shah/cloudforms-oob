@@ -4,8 +4,6 @@ ORIG="$(cd "$(dirname "$0")" || exit; pwd)"
 # shellcheck source=common.sh
 . "${ORIG}/common.sh"
 
-IFS=";"
-
 # CloudForms OrderGanza - Patrick Rutledge <prutledg@redhat.com>
 #                       - Guillaume Coré <gucore@redhat.com>
 
@@ -18,7 +16,7 @@ apiWait=${apiWait:-1} # Seconds between API calls in a group
 # Dont touch from here on
 
 usage() {
-    echo "Error: Usage $0 -c <catalog name> -i <item name> [ -u <username> -t <totalRequests> -g <groupCount> -p <groupWait> -a <apiWait> -w <uri> -d <key1=value;key2=value> -y ]"
+    echo "Error: Usage $0 -c <catalog name> -i <item name> [ -u <username> -t <totalRequests> -g <groupCount> -p <groupWait> -a <apiWait> -w <uri> -d <key1=value,key2=value> -y ]"
 }
 
 while getopts yu:c:i:t:g:p:a:w:d: FLAG; do
@@ -90,6 +88,7 @@ then
     fi
 fi
 
+IFS=","
 KPS=""
 if [ -n "$keypairs" ]
 then
@@ -100,6 +99,7 @@ then
         KPS="${KPS}, \"${k}\" : \"${v}\""
     done
 fi
+unset IFS
 
 PAYLOAD="{ \"action\": \"order\", \"resource\": { \"href\": \"${uri}/api/service_templates/${itemID}\"${KPS} } }"
 
