@@ -51,10 +51,10 @@ while read -r itemID name; do
         exit 2
     fi
 
-    PAYLOAD="{ \"action\": \"retire\", \"resource\": { \"href\": \"${uri}/api/services/${itemID}\" } }"
+    PAYLOAD="{ \"action\": \"retire\" }"
 
     cfpost \
         -d "${PAYLOAD}" \
-        "${uri}/api/services" \
-        | jq -r '.results[]| (.id|tostring) + " " + .name'
+        "${uri}/api/services/${itemID}" \
+        | jq -r '(.id|tostring) + " " + .name'
 done
