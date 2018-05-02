@@ -16,10 +16,10 @@ apiWait=${apiWait:-1} # Seconds between API calls in a group
 # Dont touch from here on
 
 usage() {
-    echo "Error: Usage $0 -c <catalog name> -i <item name> [ -u <username> -t <totalRequests> -g <groupCount> -p <groupWait> -a <apiWait> -w <uri> -d <key1=value,key2=value> -y ]"
+    echo "Error: Usage $0 -c <catalog name> -i <item name> [ -u <username> -t <totalRequests> -g <groupCount> -p <groupWait> -a <apiWait> -w <uri> -d <key1=value,key2=value> -y -G CF_Group]"
 }
 
-while getopts yu:c:i:t:g:p:a:w:d: FLAG; do
+while getopts yu:c:i:t:g:p:a:w:d:G: FLAG; do
     case $FLAG in
         y) noni=1;;
         u) username="$OPTARG";;
@@ -31,6 +31,7 @@ while getopts yu:c:i:t:g:p:a:w:d: FLAG; do
         a) apiWait="$OPTARG";;
         w) uri="$OPTARG";;
         d) keypairs="$OPTARG";;
+        G) cfgroup="$OPTARG";;
         *) usage;exit;;
     esac
 done
@@ -61,7 +62,13 @@ if [ -z "$password" ]; then
     echo
 fi
 
-catalogID=$(cfget "/api/service_catalogs?attributes=name,id&expand=resources"\
+group_headers=()
+if [ -n "$cfgroup" ]; then
+    group_headers=(-H "X-MIQ-Group: ${cfgroup}")
+fi
+
+
+catalogID=$(cfget "${group_headers[@]}" "${uri}/api/service_catalogs?attributes=name,id&expand=resources" \
                 | jq -r ".resources[] | select(.name == \"${catalogName}\") | .id")
 
 if [ -z "${catalogID}" ]; then
@@ -69,7 +76,7 @@ if [ -z "${catalogID}" ]; then
     exit 2
 fi
 
-itemID=$(cfget "/api/service_templates?attributes=service_template_catalog_id,id,name&expand=resources" \
+itemID=$(cfget "${group_headers[@]}" "${uri}/api/service_templates?attributes=service_template_catalog_id,id,name&expand=resources" \
              | jq -r ".resources[] | select(.name == \"${itemName}\") | .id")
 
 if [ -z "${itemID}" ]; then
@@ -114,6 +121,7 @@ while [ $t -le "$totalRequests" ]; do
         cfpost \
             "${uri}/api/service_catalogs/${catalogID}/service_templates" \
             -d "$PAYLOAD" \
+            "${group_headers[@]}" \
             | python -m json.tool
         (( c = c + 1 ))
         (( t = t + 1 ))

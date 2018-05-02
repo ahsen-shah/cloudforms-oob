@@ -44,7 +44,7 @@ cfget() {
          -H "X-Auth-Token: ${tok}" \
          -H "Content-Type: application/json" \
          -X GET \
-         "${uri}/${1}"
+         "$@"
 }
 
 
@@ -61,7 +61,7 @@ cfpost() {
 
 get_my_user_id() {
     cfget \
-        "/api/users?attributes=id,userid,name\&filter\[\]=userid='${username}'&expand=resources" \
+        "${uri}/api/users?attributes=id,userid,name\&filter\[\]=userid='${username}'&expand=resources" \
         | jq -r ".resources[] | select(.userid == \"${username}\") | .id"
 }
 

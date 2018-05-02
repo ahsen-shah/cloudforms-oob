@@ -22,7 +22,7 @@ usage() {
     echo "ex:   . credentials.rc; ./get_svc.sh | grep 'OCP'| ./delete_svc.sh"
 }
 
-while getopts hu: FLAG; do
+while getopts hu:w: FLAG; do
     case $FLAG in
         u) username="$OPTARG"
            export username
@@ -43,7 +43,7 @@ fi
 
 while read -r itemID name; do
     # ensure (itemID name) couple makes sense
-    remoteName=$(cfget "/api/services/${itemID}?attributes=name\&expand=resources" \
+    remoteName=$(cfget "${uri}/api/services/${itemID}?attributes=name\&expand=resources" \
                      | jq -r '.name')
 
     if [ "${name}" != "${remoteName}" ]; then
