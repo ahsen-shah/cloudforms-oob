@@ -1,0 +1,3 @@
+= RedHat OpenTLC scripts
+
+In this directory, you will find scripts that are specific to our organization and would probably not work with a vanilla CloudForms.

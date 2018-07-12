@@ -8,7 +8,7 @@ ORIG="$(cd "$(dirname "$0")" || exit; pwd)"
 #                       - Guillaume Coré <gucore@redhat.com>
 
 # Defaults
-totalRequests=${totalRequests:-10} # Total number of requests
+totalRequests=${totalRequests:-1} # Total number of requests
 groupCount=${groupCount:-5} # Number to order at one time
 groupWait=${groupWait:-1} # Minutes between groups
 apiWait=${apiWait:-1} # Seconds between API calls in a group
