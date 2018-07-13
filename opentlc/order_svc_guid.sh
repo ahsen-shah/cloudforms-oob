@@ -5,18 +5,21 @@
 # - uri
 
 set -ue -o pipefail
-ORIG="$(cd $(dirname "$0")/..; pwd)"
+ORIG="$(cd "$(dirname "$0")"/..; pwd)"
 
+# shellcheck source=common.sh
 . "${ORIG}/common.sh"
 
 # Env variables
 : "${credentials?"credentials not defined"}"
 : "${uri?"uri not defined"}"
 
-export username=$(echo $credentials | cut -d: -f1)
-export password=$(echo $credentials | cut -d: -f2)
+username=$(echo "$credentials" | cut -d: -f1)
+export username
+password=$(echo "$credentials" | cut -d: -f2)
+export password
 
-service_request_id=$(${ORIG}/order_svc.sh -y "$@" |jq -r '.results[].id')
+service_request_id=$("${ORIG}/order_svc.sh" -y "$@" |jq -r '.results[].id')
 
 for i in $(seq 20); do
     status=$(cfget "${uri}/api/service_requests/${service_request_id}" \
@@ -30,9 +33,6 @@ for i in $(seq 20); do
 done
 
 get_token
-
-# grab last env, export service_id for next job in pipeline
-service_id=$("${ORIG}/get_svc.sh" | sort -n | tail -n1 | cut -d' ' -f 1)
 
 # workaround to get GUID: wait for the name to be changed
 # (until guid is set back into the service_request, so it can be query properly
