@@ -4,6 +4,7 @@
 # - credentials  (username:password)
 # - uri
 
+set -x
 set -ue -o pipefail
 ORIG="$(cd "$(dirname "$0")"/..; pwd)"
 

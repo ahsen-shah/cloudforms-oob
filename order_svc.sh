@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 ORIG="$(cd "$(dirname "$0")" || exit; pwd)"
 
 # shellcheck source=common.sh
