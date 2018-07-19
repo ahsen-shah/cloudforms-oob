@@ -77,6 +77,8 @@ if [ -z "${catalogID}" ]; then
     exit 2
 fi
 
+cfget "${group_headers[@]}" "${uri}/api/service_templates?attributes=service_template_catalog_id,id,name&expand=resources"
+
 itemID=$(cfget "${group_headers[@]}" "${uri}/api/service_templates?attributes=service_template_catalog_id,id,name&expand=resources" \
              | jq -r ".resources[] | select(.name == \"${itemName}\") | .id")
 
