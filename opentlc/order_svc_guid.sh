@@ -43,7 +43,7 @@ service_id=$("${ORIG}/get_svc.sh" | sort -n | tail -n1 | cut -d' ' -f 1)
 
 for i in $(seq 30); do
     GUID=$("${ORIG}/get_svc.sh" \
-               | grep ${service_id}
+               | grep ${service_id} \
                | perl -pe 'if (/-[\w\d]+$/) {s/.*-([\d\w]+)$/$1/} else {$_ = ""}')
     if [ -n "$GUID" ]; then
         break
