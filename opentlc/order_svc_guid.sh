@@ -21,7 +21,7 @@ export password
 
 service_request_id=$("${ORIG}/order_svc.sh" -y "$@" |jq -r '.results[].id')
 
-for i in $(seq 20); do
+for i in $(seq 40); do
     status=$(cfget "${uri}/api/service_requests/${service_request_id}" \
                  | jq -r '.request_state + "-" + .message')
 
@@ -31,6 +31,8 @@ for i in $(seq 20); do
 
     sleep "$i"
 done
+
+[ "$status" = "active-In Process" ]
 
 get_token
 
