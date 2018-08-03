@@ -25,10 +25,10 @@ for i in $(seq 40); do
     status=$(cfget "${uri}/api/service_requests/${service_request_id}" \
                  | jq -r '.request_state + "-" + .message')
 
-    if [[ "$status" =~ 'Service_Template_Provisioning failed' ]]; then
-        echo ERROR >&2
-        exit 2
-    fi
+    #if [[ "$status" =~ 'Service_Template_Provisioning failed' ]]; then
+    #    echo ERROR >&2
+    #    exit 2
+    #fi
 
     if [ "$status" = "active-In Process" ]; then
         break
