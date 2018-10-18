@@ -48,14 +48,12 @@ if [ -z "$password" ]; then
     echo
 fi
 
-my_id=$(get_my_user_id)
-
 if [ -n "$id" ]; then
     cfget \
-        "${uri}/api/services/${id}?attributes=all\&filter\[\]=evm_owner_id=${my_id}\&expand=resources" \
+        "${uri}/api/services/${id}?attributes=all\&expand=resources" \
         | jq .
 else
     cfget \
-        "${uri}/api/services?attributes=name\&filter\[\]=evm_owner_id=${my_id}\&expand=resources" \
+        "${uri}/api/services?attributes=name\&expand=resources" \
         | jq -r '.resources[]|(.id|tostring) + " " + .name'
 fi

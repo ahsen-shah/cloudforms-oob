@@ -59,6 +59,7 @@ cfpost() {
          "$@"
 }
 
+# Run this as admin
 get_my_user_id() {
     cfget \
         "${uri}/api/users?attributes=id,userid,name\&filter\[\]=userid='${username}'&expand=resources" \
