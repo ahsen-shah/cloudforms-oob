@@ -35,7 +35,7 @@ guid="$1"
 # you can order a service with regular user,
 # but you cannot retire the service. This is a workaround.
 "${ORIG}/get_svc.sh" \
-    | grep -E "${guid}(\$|_)" \
+    | grep -E "${guid}(\$|_COMPLETED\$|_FAILED\$)" \
     | (export username=${admin_username}
        export password=${admin_password}
        "${ORIG}/delete_svc.sh")
