@@ -43,7 +43,7 @@ fi
 
 while read -r itemID name; do
     # ensure (itemID name) couple makes sense
-    remoteName=$(cfget "${uri}/api/services/${itemID}?attributes=name\&expand=resources" \
+    remoteName=$(cfget "${uri}/api/services/${itemID}?attributes=name&expand=resources" \
                      | jq -r '.name')
 
     if [ "${name}" != "${remoteName}" ]; then

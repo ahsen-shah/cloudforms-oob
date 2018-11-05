@@ -50,10 +50,10 @@ fi
 
 if [ -n "$id" ]; then
     cfget \
-        "${uri}/api/services/${id}?attributes=all\&expand=resources" \
+        "${uri}/api/services/${id}?attributes=all&expand=resources" \
         | jq .
 else
     cfget \
-        "${uri}/api/services?attributes=name\&expand=resources" \
+        "${uri}/api/services?attributes=name&expand=resources" \
         | jq -r '.resources[]|(.id|tostring) + " " + .name'
 fi

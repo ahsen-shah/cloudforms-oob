@@ -17,7 +17,7 @@ get_token() {
     : "${password?"password not set"}"
     : "${uri?"uri not set"}"
 
-    token_info=$(curl $CURLOPT -s --user "${username}:${password}" \
+    token_info=$(curl "${CURLOPT}" -s --user "${username}:${password}" \
                       -X GET -H "Accept: application/json" \
                       "${uri}/api/auth" \
                      | jq -r '.auth_token + ";" + (.token_ttl|tostring)')
@@ -35,12 +35,11 @@ get_token() {
     export tok_expire_on
 }
 
-# curl shortcut to GET, you don't have to provide complete URI,
-# path is enough, for example: cfget /api/services
+# curl shortcut to GET, you have to provide complete URI
 cfget() {
     get_token
 
-    curl $CURLOPT -s \
+    curl "${CURLOPT}" -s \
          -H "X-Auth-Token: ${tok}" \
          -H "Content-Type: application/json" \
          -X GET \
@@ -52,7 +51,7 @@ cfget() {
 cfpost() {
     get_token
 
-    curl $CURLOPT -s \
+    curl "${CURLOPT}" -s \
          -H "X-Auth-Token: ${tok}" \
          -H "Content-Type: application/json" \
          -X POST \
@@ -62,7 +61,7 @@ cfpost() {
 # Run this as admin
 get_my_user_id() {
     cfget \
-        "${uri}/api/users?attributes=id,userid,name\&filter\[\]=userid='${username}'&expand=resources" \
+        "${uri}/api/users?attributes=id,userid,name&filter[]=userid='${username}'&expand=resources" \
         | jq -r ".resources[] | select(.userid == \"${username}\") | .id"
 }
 
