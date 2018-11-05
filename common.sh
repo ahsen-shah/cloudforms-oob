@@ -17,7 +17,7 @@ get_token() {
     : "${password?"password not set"}"
     : "${uri?"uri not set"}"
 
-    token_info=$(curl -s --user "${username}:${password}" \
+    token_info=$(curl $CURLOPT -s --user "${username}:${password}" \
                       -X GET -H "Accept: application/json" \
                       "${uri}/api/auth" \
                      | jq -r '.auth_token + ";" + (.token_ttl|tostring)')
@@ -40,7 +40,7 @@ get_token() {
 cfget() {
     get_token
 
-    curl -s \
+    curl $CURLOPT -s \
          -H "X-Auth-Token: ${tok}" \
          -H "Content-Type: application/json" \
          -X GET \
@@ -52,7 +52,7 @@ cfget() {
 cfpost() {
     get_token
 
-    curl -s \
+    curl $CURLOPT -s \
          -H "X-Auth-Token: ${tok}" \
          -H "Content-Type: application/json" \
          -X POST \
