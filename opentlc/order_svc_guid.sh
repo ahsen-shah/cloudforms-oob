@@ -26,7 +26,7 @@ for i in $(seq 40); do
     service_id=$(cfget "${uri}/api/service_requests/${service_request_id}/request_tasks?expand=resources" \
           | jq -r '.resources[].destination_id')
 
-    if [ -n "$service_id" ]; then
+    if [ -n "$service_id" -a "$service_id" != "null" ]; then
         break
     fi
 
