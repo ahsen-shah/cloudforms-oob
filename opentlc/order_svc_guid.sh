@@ -46,7 +46,7 @@ get_token
 # using service_request_id)
 
 # get the last service ID
-service_id=$("${ORIG}/get_svc.sh" | sort -n | tail -n1 | cut -d' ' -f 1)
+service_id=$("${ORIG}/get_svc.sh" | grep "${username}" | sort -n | tail -n1 | cut -d' ' -f 1)
 
 for i in $(seq 30); do
     GUID=$("${ORIG}/get_svc.sh" \
