@@ -1,0 +1,48 @@
+---
+- name: Get a lab or workshop from Cloudforms 
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    username: ankay-redhat.com
+    password: PASS_ME_IN_WITH_MINUS_E
+    cloudforms_fqdn: https://labs.opentlc.com
+
+  tasks:
+
+    - name: Get token
+      uri:
+        method: GET
+        url: "{{ cloudforms_fqdn }}/api/auth"
+        user: "{{ username }}"
+        password: "{{ password }}"
+        return_content: yes
+        body_format: json
+      register: cloudforms_authentication_response  
+
+    - name: Set user token
+      set_fact:
+        user_token: "{{ cloudforms_authentication_response.json.auth_token }}"
+          
+    - name: Output cloudforms authentication response
+      debug:
+        msg: "user token is {{ user_token }}"
+        verbosity: 2
+
+    - name: Get lab catalogues
+      uri:
+        method: GET
+        url: "{{ cloudforms_fqdn }}/api/service_catalogs?expand=resources,service_templates"
+        headers:
+          X-Auth-Token: "{{ user_token }}"
+        return_content: yes
+      register: cloudforms_lab_response  
+
+    - name: Output cloudforms lab request response
+      debug:
+        msg: 
+          - "====== CUT HERE ====="
+          - "{{ cloudforms_lab_response.content.resources[]}}"
+          - "====== CUT HERE ====="
+...
+
