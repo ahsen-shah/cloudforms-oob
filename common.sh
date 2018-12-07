@@ -43,7 +43,8 @@ cfget() {
 
     CURLOPT=${CURLOPT:-}
 
-    local output=$(mktemp)
+    local output
+    output=$(mktemp)
 
     curl "${CURLOPT}" -s \
          -H "X-Auth-Token: ${tok}" \
@@ -55,8 +56,7 @@ cfget() {
         echo >&2 ""
         echo >&2 "DEBUG curl output"
         echo >&2 ""
-        jq . < "${output}" >&2
-        if [ $? != 0 ]; then
+        if ! jq . < "${output}" >&2; then
             cat "${output}" >&2
         fi
         echo >&2 ""
@@ -72,7 +72,8 @@ cfpost() {
 
     CURLOPT=${CURLOPT:-}
 
-    local output=$(mktemp)
+    local output
+    output=$(mktemp)
 
     curl "${CURLOPT}" -s \
          -H "X-Auth-Token: ${tok}" \
@@ -84,8 +85,7 @@ cfpost() {
         echo >&2 ""
         echo >&2 "DEBUG curl output"
         echo >&2 ""
-        jq . < "${output}" >&2
-        if [ $? != 0 ]; then
+        if ! jq . < "${output}" >&2; then
             cat "${output}" >&2
         fi
         echo >&2 ""
