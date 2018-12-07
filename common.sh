@@ -43,11 +43,26 @@ cfget() {
 
     CURLOPT=${CURLOPT:-}
 
+    local output=$(mktemp)
+
     curl "${CURLOPT}" -s \
          -H "X-Auth-Token: ${tok}" \
          -H "Content-Type: application/json" \
          -X GET \
-         "$@"
+         "$@" | tee -a "${output}"
+
+    if [ -n "$DEBUG" ]; then
+        echo >&2 ""
+        echo >&2 "DEBUG curl output"
+        echo >&2 ""
+        jq . < "${output}" >&2
+        if [ $? != 0 ]; then
+            cat "${output}" >&2
+        fi
+        echo >&2 ""
+    fi
+
+    rm "${output}"
 }
 
 
@@ -57,11 +72,26 @@ cfpost() {
 
     CURLOPT=${CURLOPT:-}
 
+    local output=$(mktemp)
+
     curl "${CURLOPT}" -s \
          -H "X-Auth-Token: ${tok}" \
          -H "Content-Type: application/json" \
          -X POST \
-         "$@"
+         "$@" | tee -a "${output}"
+
+    if [ -n "$DEBUG" ]; then
+        echo >&2 ""
+        echo >&2 "DEBUG curl output"
+        echo >&2 ""
+        jq . < "${output}" >&2
+        if [ $? != 0 ]; then
+            cat "${output}" >&2
+        fi
+        echo >&2 ""
+    fi
+
+    rm "${output}"
 }
 
 # Run this as admin
