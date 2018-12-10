@@ -42,6 +42,7 @@ cfget() {
     get_token
 
     CURLOPT=${CURLOPT:-}
+    DEBUG=${DEBUG:-}
 
     local output
     output=$(mktemp)
@@ -71,6 +72,7 @@ cfpost() {
     get_token
 
     CURLOPT=${CURLOPT:-}
+    DEBUG=${DEBUG:-}
 
     local output
     output=$(mktemp)
