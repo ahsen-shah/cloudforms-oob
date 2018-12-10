@@ -27,7 +27,10 @@ export admin_password
 
 
 guid="$1"
+# GUID is not empty string
 [ -n "${guid}" ]
+# GUID should be at least 4 chars
+[ "${#guid}" -ge 4 ]
 
 # Get svc id and name (using regular user).
 # Then delete using admin account. Why delete using admin account ?
@@ -36,6 +39,7 @@ guid="$1"
 # but you cannot retire the service. This is a workaround.
 "${ORIG}/get_svc.sh" \
     | grep -E "${guid}(\$|_COMPLETED\$|_FAILED\$)" \
+    | grep "${username}" \
     | (export username=${admin_username}
        export password=${admin_password}
        "${ORIG}/delete_svc.sh")
