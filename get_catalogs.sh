@@ -23,7 +23,7 @@ while getopts nu:w: FLAG; do
     esac
 done
 
-if ! which jq > /dev/null; then
+if ! command -v jq > /dev/null; then
     echo >&2 "please install jq"
     exit 2
 fi
