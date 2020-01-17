@@ -36,18 +36,17 @@ done
 [ -n "${service_id}" ]
 
 for i in $(seq 30); do
-    sleep "$((i+5))"
-    service_json=$(cfget "${uri}/api/services/${service_id}")
+    sleep "$((i+10))"
+    service_json=$(cfget "${uri}/api/services/${service_id}/?expand=custom_attributes")
 
     created_at=$(echo "${service_json}" | jq -r .created_at)
     updated_at=$(echo "${service_json}" | jq -r .updated_at)
 
+
     # If the service was never updated since creation, continue
     [ "${created_at}" = "${updated_at}" ] && continue
 
-    GUID=$(echo "${service_json}" \
-               | jq -r .name \
-               | perl -pe 'if (/-[\w\d]+$/) {s/.*-([\d\w]+)$/$1/} else {$_ = ""}')
+    GUID=$(echo "${service_json}"|jq -r '.custom_attributes[]|select(.name=="GUID")|.value')
 
     if [ -n "$GUID" ]; then
         break
