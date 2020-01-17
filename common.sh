@@ -53,7 +53,7 @@ cfget() {
          -X GET \
          "$@" | tee -a "${output}"
 
-    if [ -n "$DEBUG" ]; then
+    if [ -n "$DEBUG" ] && [ "$DEBUG" != "false" ]; then
         echo >&2 ""
         echo >&2 "DEBUG curl output"
         echo >&2 ""
@@ -83,7 +83,7 @@ cfpost() {
          -X POST \
          "$@" | tee -a "${output}"
 
-    if [ -n "$DEBUG" ]; then
+    if [ -n "$DEBUG" ] && [ "$DEBUG" != "false" ]; then
         echo >&2 ""
         echo >&2 "DEBUG curl output"
         echo >&2 ""
