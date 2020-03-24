@@ -37,9 +37,24 @@ guid="$1"
 # Because there is a limitation in the cloudforms API:
 # you can order a service with regular user,
 # but you cannot retire the service. This is a workaround.
-"${ORIG}/get_svc.sh" \
-    | grep -E "${guid}(\$|_COMPLETED\$|_FAILED\$)" \
-    | grep "${username}" \
-    | (export username=${admin_username}
-       export password=${admin_password}
-       "${ORIG}/delete_svc.sh")
+
+MAX_RETRIES=4
+retry=0
+set +e
+while [ $retry -lt $MAX_RETRIES ]; do
+    "${ORIG}/get_svc.sh" \
+        | grep -E "${guid}(\$|_COMPLETED\$|_FAILED\$)" \
+        | grep "${username}" \
+        | (export username=${admin_username}
+           export password=${admin_password}
+           "${ORIG}/delete_svc.sh")
+
+    RET=$?
+    [ $RET = 0 ] && break
+
+    echo "Delete failed. Retrying (${retry})." >&2
+    retry=$((retry + 1))
+    sleep $((2 ** retry))
+done
+
+exit $RET
