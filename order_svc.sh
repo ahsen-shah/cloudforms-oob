@@ -15,6 +15,13 @@ apiWait=${apiWait:-1} # Seconds between API calls in a group
 
 # Dont touch from here on
 
+if [ -n "${credentials}" ]; then
+    username=$(echo "$credentials" | cut -d: -f1)
+    export username
+    password=$(echo "$credentials" | cut -d: -f2)
+    export password
+fi
+
 usage() {
     echo "Error: Usage $0 -c <catalog name> -i <item name> [ -u <username> -t <totalRequests> -g <groupCount> -p <groupWait> -a <apiWait> -w <uri> -d <key1=value,key2=value> -y -G CF_Group]"
 }
